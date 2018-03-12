@@ -1,0 +1,62 @@
+//font-awesome
+@import "node_modules/font-awesome/scss/variables";
+$fa-font-path: "assets/fonts";
+@import "node_modules/font-awesome/scss/font-awesome";
+
+//bulma
+@import "node_modules/bulma/sass/utilities/initial-variables";
+@import "variables";
+@import "node_modules/bulma/bulma";
+@import "assets/extensions/all";
+@import "overrides"; 
+
+html, body {
+  overflow-y: hidden;    
+  height:100%;
+}
+
+.app-fullscreen {
+  height:100%;
+  display: flex;
+  flex-direction: column;  
+}
+.app-top, .app-middle, .app-bottom {
+  width: 100%;
+}
+.app-middle {
+  height: 100%;
+  overflow: hidden;
+  display: block;
+}
+.app-toolbar {
+  justify-content: flex-end; 
+  margin-left: auto;
+  align-items: center;
+  display: flex;
+  padding: 1rem;
+
+  .app-link {
+    height:100%;
+    color: $white-ter;
+    display: flex;
+    align-items: center;
+    padding-left: 0.5rem;
+    padding-right: 0.5rem;
+    margin-right: 0.35rem;
+
+    &:hover {
+      background-color: rgba(0,0,0,0.5);
+    }
+    &.is-active {
+      background-color: rgba(0,0,0,0.5);
+    }
+
+    .icon {
+      opacity: 0.7;
+      text-shadow: 1px 1px 1px #000000;
+    }
+
+  }
+}  
+
+

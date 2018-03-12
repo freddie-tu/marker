@@ -1,0 +1,11 @@
+# Build
+/build
+
+# Dist
+/dist
+
+# Packages
+/node_modules
+
+# Temp
+/temp

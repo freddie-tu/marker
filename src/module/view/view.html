@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <base href="" />
+  <title>preview</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="view.css">
+  <link rel="stylesheet" href="../assets/katex.min.css">
+</head>
+<body>
+  <div id="view"></div>
+  <script>
+    var electron = require('electron');
+    function onclick(url) {
+      try {
+        electron.ipcRenderer.send('project-command', {
+          command: "try-navigate",
+          url: url
+        });
+      } catch (e) {
+        alert(e);
+      }
+    }
+  </script>
+  <script type="text/javascript" src="../vendor.js"></script>
+</body>
+</body>
+</html>

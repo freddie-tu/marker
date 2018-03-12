@@ -1,0 +1,44 @@
+{
+    "version": "0.2.0",
+    "configurations": [                
+        {
+            "name": "Debug Main Process",
+            "type": "node",
+            "request": "launch",
+            "program": "${workspaceRoot}/dist/main.js",
+            "cwd": "${workspaceRoot}",
+            "runtimeExecutable": "${workspaceRoot}/node_modules/.bin/electron",
+            "runtimeArgs": [
+                //"--enable-logging",
+                "--inspect=28171",
+                "--debug-brk",
+                "--remote-debugging-port=9222"
+            ],
+            "windows": {
+                "runtimeExecutable": "${workspaceRoot}/node_modules/.bin/electron.cmd"
+            },
+            //"trace": "verbose",
+            "sourceMaps": true,
+            "port": 28171,
+            "protocol": "inspector"
+        },        
+        {
+            "name": "Debug Renderer Process",
+            "type": "chrome",
+            "request": "launch",
+            "runtimeExecutable": "${workspaceRoot}/node_modules/.bin/electron",
+            "windows": {
+                "runtimeExecutable": "${workspaceRoot}/node_modules/.bin/electron.cmd"
+            },
+            "runtimeArgs": [
+                "${workspaceRoot}/dist/main.js",
+                //"--enable-logging",
+                "--remote-debugging-port=9222"
+            ],
+            "sourceMaps": true,
+            //"trace": "verbose",
+            "port": 9222,
+            "webRoot": "${workspaceRoot}"
+        }
+    ]
+}

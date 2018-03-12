@@ -1,0 +1,73 @@
+{
+  "name": "marker",
+  "version": "1.0.0",
+  "description": "markdown editor",
+  "main": "dist/main.js",
+  "scripts": {
+    "postinstall": "node postinstall.js",
+    "clean": "gulp clean",
+    "build": "gulp build:dev",
+    "build:prod": "gulp build:prod",
+    "watch": "gulp watch",
+    "launch": "electron ./dist/host.js",
+    "release": "build",
+    "build:dev:client": "gulp webpack:dev:client",
+    "build:prod:client": "gulp webpack:prod:client",
+    "build:dev:host": "gulp webpack:dev:host",
+    "build:prod:host": "gulp webpack:prod:host"
+  },
+  "author": "Freddie",
+  "license": "ISC",
+  "dependencies": {},
+  "devDependencies": {
+    "@types/katex": "^0.5.0",
+    "@types/marked": "^0.3.0",
+    "animate.css": "^3.5.2",
+    "awesome-typescript-loader": "^3.4.1",
+    "babel-core": "^6.26.0",
+    "babel-loader": "^7.1.2",
+    "babili-webpack-plugin": "^0.1.2",
+    "brace": "^0.11.0",
+    "bulma": "^0.6.1",
+    "css-loader": "^0.28.7",
+    "electron": "^1.8.1",
+    "electron-builder": "^19.51.0",
+    "font-awesome": "^4.7.0",
+    "gulp": "^3.9.1",
+    "gulp-clean": "^0.3.2",
+    "gulp-cssmin": "^0.2.0",
+    "gulp-sass": "^3.1.0",
+    "gulp-util": "^3.0.8",
+    "html-webpack-plugin": "^2.30.1",
+    "katex": "^0.9.0-alpha2",
+    "marked": "^0.3.9",
+    "moment": "^2.20.1",
+    "node-sass": "^4.7.2",
+    "rxjs": "^5.5.6",
+    "sass-loader": "^6.0.6",
+    "shelljs": "^0.7.8",
+    "typescript": "^2.6.2",
+    "typescript-ioc": "^1.0.2",
+    "vue": "^2.5.13",
+    "vue-loader": "^13.6.2",
+    "vue-router": "^3.0.1",
+    "vue-style-loader": "^3.0.3",
+    "vue-template-compiler": "^2.5.13",
+    "webpack": "^3.10.0",
+    "webpack-merge": "^4.1.1"
+  },
+  "build": {
+    "appId": "app.marker.id",
+    "directories": {
+      "output": "build"
+    },
+    "files": [
+      "dist/**/*"
+    ],
+    "win": {
+      "icon": "config/build/icons/icon.ico"
+    },
+    "asar": true,
+    "publish": null
+  }
+}
