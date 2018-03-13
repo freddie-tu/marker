@@ -12,8 +12,10 @@
   <div id="view"></div>
   <script>
     var electron = require('electron');
-    function onclick(url) {
+    function onclick( url) {
       try {
+        
+        alert(url);
         electron.ipcRenderer.send('project-command', {
           command: "try-navigate",
           url: url

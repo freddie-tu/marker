@@ -20,6 +20,7 @@ interface ProjectData {
   files: {
     id: string;
     name: string;
+    folder: string;
     modified: boolean;
     source?: string;
     hash?: {
@@ -61,6 +62,7 @@ export class ProjectService extends IProjectService {
             return {
               id: f.id,
               name: f.name,
+              folder: f.folder,
               modified: f.modified,
               hash: f.hash ? f.hash: undefined
             }
@@ -268,17 +270,7 @@ export class ProjectService extends IProjectService {
         folder: folder,
         files: []
       };
-      var files = fs.readdirSync(folder);
-      files.forEach(file => {
-        let ext = path.extname(file).toLowerCase();
-        if(ext === ".md") {
-          data.files.push({
-            id: file,
-            name: file,
-            modified: false    
-          });
-        }
-      });
+      data = this.recursiveLoadFromFolder(folder, "", data);
 
       var selected = data.files.find(f => f.name.toLocaleLowerCase() === filename.toLocaleLowerCase());
       if(selected != null) {
@@ -293,6 +285,37 @@ export class ProjectService extends IProjectService {
     }
   }
 
+private recursiveLoadFromFolder(folder: string, basefolder: string, data: ProjectData): ProjectData {
+  var files = fs.readdirSync(folder);
+  files.forEach(file => {
+    let fn = "";
+    if(basefolder === "")
+    {
+      fn = file;
+    }else{
+      fn = basefolder+"/"+file;
+    }
+    let isDirectory = fs.statSync(path.join(folder, file)).isDirectory();
+    if(isDirectory)
+    {
+      data = this.recursiveLoadFromFolder(path.join(folder,file), fn, data);     
+    }
+    let ext = path.extname(file).toLowerCase();
+    if(ext === ".md") {
+      if(data.files.find(f => f.id === fn) == null)
+      {
+        data.files.push({
+          id: fn,
+          name: fn,
+          folder: basefolder,
+          modified: false    
+        });
+      } 
+    }
+  });
+  return data;
+}
+
   public loadFromFolder(folder: string): void {
     this.log.debug("loading the project from folder", "ProjectService.loadFromFolder", { folder: folder });
     try {
@@ -305,17 +328,7 @@ export class ProjectService extends IProjectService {
         folder: folder,
         files: []
       };
-      var files = fs.readdirSync(folder);
-      files.forEach(file => {
-        let ext = path.extname(file).toLowerCase();
-        if(ext === ".md") {
-          data.files.push({
-            id: file,
-            name: file,
-            modified: false    
-          });
-        }
-      });
+      data = this.recursiveLoadFromFolder(folder,"", data);
           
       this._data = data;
       this._changed.next(true);
@@ -398,21 +411,7 @@ export class ProjectService extends IProjectService {
       let projectChanged = false;
       let projectfiles = this._data.files;
 
-      let folerfiles = fs.readdirSync(folder);
-      folerfiles.forEach(folderfile => {
-        let ext = path.extname(folderfile).toLowerCase();
-        if(ext === ".md") {
-          let projectfile = projectfiles.find(f => f.name === folderfile);
-          if(!projectfile) {
-            projectfiles.push({
-              id: folderfile,
-              name: folderfile,
-              modified: false    
-            });
-            projectChanged = true;
-          }          
-        }
-      });
+      this._data = this.recursiveLoadFromFolder(folder, "", this._data);
 
       if(projectChanged) {
         this._changed.next(false);

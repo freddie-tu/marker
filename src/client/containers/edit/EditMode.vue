@@ -67,7 +67,7 @@ export default {
   methods: {
     updatesource() {
       this.source.hash = this.$project.setSource(this.selected.id, this.source.data);
-      this.html = this.$converter.convert(this.source.data);      
+      this.html = this.$converter.convert(this.selected.folder, this.source.data);      
     },
     updateproject() {      
       let pi = this.$project.getProjectInfo();
@@ -92,7 +92,7 @@ export default {
         this.project = pi;
         this.selected = selected;
         this.source = source;        
-        this.html = this.$converter.convert(source.data);  
+        this.html = this.$converter.convert(selected.folder, source.data);  
         
         if(selected.id != pi.selected) {
           this.$project.setSelected(selected.id);

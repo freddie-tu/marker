@@ -41,7 +41,7 @@ export default {
           if (selected) {
             let source = this.$project.getSource(selected.id);
             if(source) {
-              this.html = this.$converter.convert(source.data);  
+              this.html = this.$converter.convert(selected.folder, source.data);  
             } else {
               this.html = "no current source";  
             }

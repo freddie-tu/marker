@@ -83,6 +83,7 @@ export default {
             let file = {
               id: f.id,
               name: f.name,
+              folder: f.folder,
               modified: f.modified,
               data: {
                 hash: -1,
@@ -144,6 +145,7 @@ export default {
             let file = {
               id: f.id,
               name: f.name,
+              folder: f.folder,
               modified: f.modified,
               data: {
                 hash: -1,
@@ -188,7 +190,7 @@ export default {
         if(source) {
           let data = {
             hash: source.hash,
-            html: this.$converter.convert(source.data)
+            html: this.$converter.convert(file.folder, source.data)
           };
           file.data = data;
           return true;
