@@ -110,7 +110,10 @@ export class ConverterService extends IConverterService {
       renderer.link = function(href: string, title: string, text: string) {
         const linkUrl = url.parse(href);
         if(linkUrl && !linkUrl.protocol && curFolder) {
-          let link = path.join(folder, linkUrl.path);
+          let sublink = linkUrl.path;
+          let link = path.join(folder, sublink);
+          //A bit of magic to placate the Javascript gods.
+          link = link.replace(/\\/g, "/");
           href = `javascript:onclick('${link}')`;
         }
         return f_link.apply(this, [href, title, text]);

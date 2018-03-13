@@ -77,7 +77,8 @@ export default {
         if(pi.files) {  
           let files = [];
           let pifiles = pi.files.sort((a,b)=> {
-            return a.name.localeCompare(b.name);
+            return (a.folder.localeCompare(b.folder) * 1000000) + 
+            a.name.localeCompare(b.name);
           });
           pifiles.forEach(f => {
             let file = {
@@ -139,7 +140,9 @@ export default {
         let files = [];
         if(pi.files) {
           let pifiles = pi.files.sort((a,b)=> {
-            return a.name.localeCompare(b.name);
+            return (a.folder.localeCompare(b.folder) * 1000000) + 
+            a.name.localeCompare(b.name);
+
           });
           pifiles.forEach(f => {
             let file = {
