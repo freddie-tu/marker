@@ -7,6 +7,7 @@ export interface IProjectInfo {
   files: {
     id: string;
     name: string,
+    folder: string,
     modified: boolean;
     hash?: {
       file: number,

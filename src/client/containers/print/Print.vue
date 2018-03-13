@@ -231,7 +231,7 @@ export default {
         if(!source) {
           this.$router.replace("/home");  
         }
-        this.html = this.$converter.convert(source.data);  
+        this.html = this.$converter.convert(selected.folder, source.data);  
 
         if(selected.id != pi.selected) {
           this.$project.setSelected(selected.id);

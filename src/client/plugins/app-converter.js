@@ -13,10 +13,11 @@ appConverter.install = function (Vue, options) {
   this.log = Vue.$log;
 
   var service = {
-    convert(source) {   
+    convert(folder, source) {
       let result = ipcRenderer.sendSync('convert-command', {
         command: "convert",
-        source: source
+        source: source,
+        folder: folder
       });
       return result;
     }

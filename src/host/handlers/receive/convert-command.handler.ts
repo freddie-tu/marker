@@ -22,7 +22,8 @@ export class ConvertCommandReceiveHandler extends IConvertCommandReceiveHandler 
       let command: string = arg.command;
       if(command === "convert") {
         let source: string = arg.source;
-        let result = this._converterService.convert(source);
+        let folder: string = arg.folder;
+        let result = this._converterService.convert(folder,source);
         event.returnValue = result;
       }            
     }
