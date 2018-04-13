@@ -14,6 +14,7 @@
     var electron = require('electron');
     function onclick(url) {
       try {
+        
         electron.ipcRenderer.send('project-command', {
           command: "try-navigate",
           url: url

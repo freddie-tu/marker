@@ -7,6 +7,9 @@ export interface IProjectInfo {
   files: {
     id: string;
     name: string,
+    displayname : string,
+    extension: string,
+    folder: string,
     modified: boolean;
     hash?: {
       file: number,
@@ -21,6 +24,7 @@ export abstract class IProjectService {
   abstract getProjectInfo(): IProjectInfo;
   abstract setSelected(id: string): boolean;
   abstract getFileSource(fileid: string): { hash: number, data: string }
+  abstract getBasepath() : string;
   abstract setFileSource(fileid: string, source: string): number;
   abstract saveFile(fileid: string) : void;
   abstract saveAll(): void;

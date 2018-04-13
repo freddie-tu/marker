@@ -59,11 +59,11 @@ export class ConverterService extends IConverterService {
     }
   }
   
-  convert(src: string): string {
+  convert(folder:string, src: string): string {
     this.log.debug("convert", "ConverterService.convert");
     try {
       const md = this.convertKatex(src);
-      const html = this.convertMarkdown(md);
+      const html = this.convertMarkdown(folder,md);
       return html;
     }
     catch (e) {
@@ -92,12 +92,13 @@ export class ConverterService extends IConverterService {
     }
   }
 
-  private convertMarkdown(src: string) : string {
+  private convertMarkdown(folder: string, src: string) : string {
     this.log.debug("converting markdown", "ConverterService.convertMarkdown");
     try {
       let renderer: any = new marked.Renderer();
       let that = this;
 
+      let curFolder : string = that._projectFolder+"/"+folder;
       //rennder anchors
       const f_heading  = renderer.heading;  
       renderer.heading  = function (text: string, level: number, raw: string) {
@@ -108,8 +109,12 @@ export class ConverterService extends IConverterService {
       const f_link = renderer.link;
       renderer.link = function(href: string, title: string, text: string) {
         const linkUrl = url.parse(href);
-        if(linkUrl && !linkUrl.protocol && that._projectFolder) {
-          href = `javascript:onclick('${linkUrl.path}')`;
+        if(linkUrl && !linkUrl.protocol && curFolder) {
+          let sublink = linkUrl.path;
+          let link = path.join(folder, sublink);
+          //A bit of magic to placate the Javascript gods.
+          link = link.replace(/\\/g, "/");
+          href = `javascript:onclick('${link}')`;
         }
         return f_link.apply(this, [href, title, text]);
       }
@@ -118,8 +123,8 @@ export class ConverterService extends IConverterService {
       const f_image = renderer.image;  
       renderer.image = function (href: string, title: string, text: string) {
         const imageUrl = url.parse(href);
-        if(imageUrl && !imageUrl.protocol && that._projectFolder) {
-          const fullpath = path.join(that._projectFolder, imageUrl.path);
+        if(imageUrl && !imageUrl.protocol && curFolder) {
+          const fullpath = path.join(curFolder, imageUrl.path);
           const fileUri = that.getFileUri(fullpath);
           if(title) {
             return `<img src="${fileUri}" title="${title}" alt="${text}">`;

@@ -1,17 +1,35 @@
 <template>
   <div class="view-wrapper">
     <div class="view-left is-hidden-mobile">
-      <div class="view-filelist is-unselectable">
-        <div v-for="file in files" :key="file.id"
+      <div class="view-filelist is-unselectable" style="overflow:auto;">
+        <div v-for="folder in folders" :key="folder.name" class="view-fileitem" >
+          <div @click="onSwitchShowFolder(folder.name)">
+            <span v-if="folder.name != ''" class="icon">
+              <i :class="{'fa fa-chevron-down': folder.showcontents, 'fa fa-chevron-right': !folder.showcontents}"></i>
+            </span>
+            <span v-if="folder.name != ''" class="icon">
+              <i class="fa fa-folder"></i>
+            </span>
+            <span v-if="folder.name != ''" class="filename">
+              {{folder.name}}
+            </span>
+            </div>
+        <div v-if="folder.showcontents" v-for="file in folder.files" :key="file.id"
           class="view-fileitem" 
           :class="{'is-selected': file === selected}"
-          @click="onSelectFile(file.id)">
+          @click="onSelectFile(file.id)" :style="{ 'margin-left': file.depth + 'px'}">
             <span class="icon" :class="{'has-text-info': file.modified}">
-              <i class="fa fa-file"></i>
+              <i :class="{
+                'fa fa-file-text':file.extension == '.md', 
+                'fa fa-file-picture-o':file.extension == '.png'||file.extension == '.jpg'||file.extension == '.jpeg'||file.extension == '.bmp'||file.extension == '.gif', 
+                'fa fa-file-excel-o':file.extension == '.xlsx', 
+                
+                'fa fa-file':file.extension != '.xlsx'&&file.extension != '.png'&&file.extension != '.jpg'&&file.extension != '.jpeg'&&file.extension != '.bmp'&&file.extension != '.gif'&&file.extension != '.md'}"></i>
             </span>
             <span class="filename" :class="{'has-text-info': file.modified}">
               {{file.name}}
             </span>
+            </div>
         </div>
       </div>
     </div>
@@ -29,6 +47,7 @@ export default {
       subscriptions: [],
       project: {},
       files: [],
+      folders: [],
       selected: null
     };
   },
@@ -62,6 +81,15 @@ export default {
       }      
       this.$project.setSelected(id);
     },
+    onSwitchShowFolder(folderName) {
+      try {
+        let folder = this.folders.find(fo => fo.name == folderName);
+        folder.showcontents = !folder.showcontents;
+      }
+      catch(e) {
+        this.$log.error("error switching show folder", "onSwitchShowFolder", e);
+      }
+    },
     update() {     
       let pi = this.$project.getProjectInfo();
       if(pi) {        
@@ -74,21 +102,67 @@ export default {
     },
     updateCurrentProject(pi) {      
       try {
+        this.updateProject(pi);
+      }
+      catch(e) {
+        this.$log.error("error updating the project", "updateCurrentProject", e);
+      }
+    },
+    updateNewProject(pi) {
+      try {
+        this.updateProject(pi);
+      }
+      catch(e) {
+        this.$log.error("error updating to new project", "updateNewProject", e);
+      }
+    },
+    updateProject(pi) {
+      try {
         if(pi.files) {  
+        let project = {
+          uid: pi.uid,
+          folder: pi.folder
+        };
           let files = [];
+          let folders = [];
           let pifiles = pi.files.sort((a,b)=> {
-            return a.name.localeCompare(b.name);
+            return (a.folder.localeCompare(b.folder) * 1000000) + 
+            a.name.localeCompare(b.name);
           });
           pifiles.forEach(f => {
+            let d = f.folder.split("/").length;
+            if(f.folder == "")d = 0;
             let file = {
               id: f.id,
-              name: f.name,
+              name: f.displayname,
+              folder: f.folder,
+              depth: d * 10 + 30,
+              extension: f.extension,
               modified: f.modified,
               data: {
                 hash: -1,
                 html: null
               }
             };
+            if(f.hash) {
+              let current = this.files.find(cf => cf.id === file.id);
+              if(current && current.data.hash === f.hash.current) {
+                file.data = current.data;
+              }
+            }
+            if(folders.findIndex(fo => fo.name == f.folder) == -1)
+            {
+              let folder = {
+                name: f.folder,
+                showcontents: true,
+                files: []
+              };
+              folder.files.push(file);
+              folders.push(folder);
+            }else{
+              let folder = folders.find(fo => fo.name == f.folder);
+              folder.files.push(file);
+            }
             if(f.hash) {
               let current = this.files.find(cf => cf.id === file.id);
               if(current && current.data.hash === f.hash.current) {
@@ -114,8 +188,10 @@ export default {
             }
           }
 
+          this.project = project;
           this.selected = selected,
           this.files = files;     
+          this.folders = folders;     
 
           if(selected && selected.id != pi.selected) {
             this.$project.setSelected(selected.id);
@@ -123,73 +199,40 @@ export default {
         } else {
           this.selected = null,
           this.files = [];          
+          this.folders = [];          
         }
       }
       catch(e) {
-        this.$log.error("error updating the project", "updateCurrentProject", e);
-      }
-    },
-    updateNewProject(pi) {
-      try {
-        let project = {
-          uid: pi.uid,
-          folder: pi.folder
-        };
-        let files = [];
-        if(pi.files) {
-          let pifiles = pi.files.sort((a,b)=> {
-            return a.name.localeCompare(b.name);
-          });
-          pifiles.forEach(f => {
-            let file = {
-              id: f.id,
-              name: f.name,
-              modified: f.modified,
-              data: {
-                hash: -1,
-                html: null
-              }
-            };
-            files.push(file);
-          });
-        }      
-
-        let selected = null;
-        if(pi.selected) {
-          selected = files.find(f => f.id === pi.selected);
-        } 
-        if(!selected && files.length > 0) {
-          selected = files[0];          
-        }                
-        if(selected) {          
-          if(!this.updateHtml(selected)) {
-           selected.data = {
-              hash: -2,
-              html: "<p>error updating the html</p>"
-            }
-          }
-        }
-
-        this.project = project;
-        this.files = files;
-        this.selected = selected;
-        
-        if(selected && selected.id != pi.selected) {
-          this.$project.setSelected(selected.id);
-        }        
-      }
-      catch(e) {
-        this.$log.error("error updating to new project", "updateNewProject", e);
+        this.$log.error("error updating the project", "updateProject", e);
       }
     },
     updateHtml(file) {
       try {
+        if(file.extension == '.md')
+        {
         let source = this.$project.getSource(file.id);
         if(source) {
           let data = {
             hash: source.hash,
-            html: this.$converter.convert(source.data)
+            html: this.$converter.convert(file.folder, source.data)
           };
+          file.data = data;
+          return true;
+        }
+        }else if(file.extension == '.png'||file.extension == '.jpg'||file.extension == '.jpeg'||file.extension == '.bmp'||file.extension == '.gif'){
+          let source = this.$project.getSource(file.id);
+          let data = {
+            hash: source.hash,
+            html: '<IMG SRC='+this.$project.getBasepath()+'/'+file.folder+'/'+file.name+'>'
+          }
+          file.data = data;
+          return true;
+        }else{
+          let source = this.$project.getSource(file.id);
+          let data = {
+            hash: source.hash,
+            html: 'Unopenable file T_T'
+          }
           file.data = data;
           return true;
         }
@@ -199,6 +242,7 @@ export default {
         this.$log.warning("error updating the html", "updateHtml", e);   
         return false;         
       }
+      
     }
   },
   components: {
