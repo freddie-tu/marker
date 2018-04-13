@@ -79,6 +79,11 @@ appProject.install = function (Vue, options) {
         id: id
       }); 
     },
+    getBasepath() {
+      return ipcRenderer.sendSync('project-command', {
+        command: "get-basepath"
+      }); 
+    },
     setSource(id, text) {
       return ipcRenderer.sendSync('project-command', {
         command: "set-source",

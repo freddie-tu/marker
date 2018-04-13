@@ -37,6 +37,10 @@ export class ProjectCommandReceiveHandler extends IProjectCommandReceiveHandler 
           this.handleGetSourceCommand(event, arg);  
           break;
         }
+        case "get-basepath": {
+          this.handleGetBasepathCommand(event, arg);  
+          break;
+        }
         case "set-source": {
           this.handleSetSourceCommand(event, arg);  
           break;
@@ -88,6 +92,16 @@ export class ProjectCommandReceiveHandler extends IProjectCommandReceiveHandler 
       this.log.debug("error open project command", "ProjectCommandReceiveHandler.handleOpenCommand", arg);
     }
     event.returnValue = null; 
+  }
+  private handleGetBasepathCommand(event: any, arg: any): void  {
+    this.log.debug("get basepath command", "ProjectCommandReceiveHandler.handleGetBasepathCommand", arg);
+    try {
+        event.returnValue = this._projectService.getBasepath();
+    }
+    catch(e) {
+      this.log.debug("error get source command", "ProjectCommandReceiveHandler.handleGetSourceCommand", arg);
+      event.returnValue = null;
+    }    
   }
 
   private handleGetSourceCommand(event: any, arg: any): void  {

@@ -20,6 +20,8 @@ interface ProjectData {
   files: {
     id: string;
     name: string;
+    displayname: string;
+    extension: string;
     folder: string;
     modified: boolean;
     source?: string;
@@ -62,6 +64,8 @@ export class ProjectService extends IProjectService {
             return {
               id: f.id,
               name: f.name,
+              displayname: f.displayname,
+              extension: f.extension,
               folder: f.folder,
               modified: f.modified,
               hash: f.hash ? f.hash: undefined
@@ -95,6 +99,19 @@ export class ProjectService extends IProjectService {
     } 
     catch(e) {
       this.log.error("error setting the selected file", "ProjectService.setSelected", e);
+    }
+  }
+
+  public getBasepath() : string {
+    this.log.debug("geting the base path", "ProjectService.getBasepath", null);
+    try {
+      if(!this._data) {
+        throw new Error("no project loaded");
+      }
+        return this._data.folder;
+    }
+    catch(e) {
+      this.log.error("error geting the base path", "ProjectService.getBasepath", e);
     }
   }
 
@@ -301,12 +318,14 @@ private recursiveLoadFromFolder(folder: string, basefolder: string, data: Projec
       data = this.recursiveLoadFromFolder(path.join(folder,file), fn, data);     
     }
     let ext = path.extname(file).toLowerCase();
-    if(ext === ".md") {
+    if(ext.startsWith(".")) {
       if(data.files.find(f => f.id === fn) == null)
       {
         data.files.push({
           id: fn,
           name: fn,
+          displayname: file,
+          extension: ext,
           folder: basefolder,
           modified: false    
         });
